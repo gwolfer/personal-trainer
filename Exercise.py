@@ -3,6 +3,7 @@
 
 from datetime import datetime
 from math import log
+import os
 
 class Exercise(object):
     
@@ -10,6 +11,7 @@ class Exercise(object):
     self.__id = params['id']
     self.__history = []
     self.__total = 0
+    self.__directory = 'records'
     
     self._label = params['label']
     self._steps = params['steps']    
@@ -18,7 +20,9 @@ class Exercise(object):
     
   def __load(self):
     try:
-      with open('records/%s.rec' % self.__id, 'r') as f:
+      if not os.path.exists(self.__directory):
+        os.makedirs(self.__directory)
+      with open(self.__directory + '/%s.rec' % self.__id, 'r') as f:
         for line in f:
           (timestamp, step) = line.rstrip('\n').split('|')
           step = int(step)
@@ -32,7 +36,7 @@ class Exercise(object):
     self.__total += step
     self.__history.append({'timestamp': timestamp, 'step': step})
     try:
-      with open('records/%s.rec' % self.__id, 'a') as f:
+      with open(self.__directory + '/%s.rec' % self.__id, 'a') as f:
         f.write('%s|%d\n' % (timestamp, step))
     except Exception as e:
       print e
